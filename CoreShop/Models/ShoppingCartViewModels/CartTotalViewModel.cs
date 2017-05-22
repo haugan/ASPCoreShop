@@ -1,6 +1,6 @@
-﻿namespace CoreShop.Models.StoreViewModels
+﻿namespace CoreShop.Models.ShoppingCartViewModel
 {
-    public class ShoppingCartTotalGroup
+    public class CartTotalViewModel
     {
         public ShoppingCart Cart { get; set; }
         public decimal CartTotal { get; set; }

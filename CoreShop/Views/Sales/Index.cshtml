@@ -1,4 +1,4 @@
-﻿@model PageList<CoreShop.Models.StoreViewModels.CustomerOrdersGroup>
+﻿@model PageList<CoreShop.Models.ShoppingCartViewModel.CustomerOrdersViewModel>
 
 @{
     ViewData["Title"] = "Sales index";
@@ -23,7 +23,7 @@
         <tr>
             <th><a asp-action="Index" asp-route-sortOrder="@ViewData["SortCustomerNumber"]" asp-route-filter="@ViewData["SearchFilter"]">Customer #</a></th>
             <th><a asp-action="Index" asp-route-sortOrder="@ViewData["SortOrderCount"]" asp-route-filter="@ViewData["SearchFilter"]">Order count</a></th>
-            <th>Total quantity</th> <!--TODO: IMPLEMENT-->
+            <th>Total</th> <!--TODO: IMPLEMENT-->
             <th></th>
         </tr>
     </thead>

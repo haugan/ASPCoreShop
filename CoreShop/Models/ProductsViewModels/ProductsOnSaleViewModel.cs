@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 
-namespace CoreShop.Models.StoreViewModels
+namespace CoreShop.Models.ShoppingCartViewModel
 {
-    public class ProductsOnSaleGroup
+    public class ProductsOnSaleViewModel
     {
         public IEnumerable<Product> ProductsOnSale { get; set; }
     }

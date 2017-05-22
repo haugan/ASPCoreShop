@@ -1,8 +1,8 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace CoreShop.Models.StoreViewModels
+namespace CoreShop.Models.ShoppingCartViewModel
 {
-    public class CustomerOrdersGroup
+    public class CustomerOrdersViewModel
     {
         public int CustomerID { get; set; }
         [Display(Name="Customer #")]

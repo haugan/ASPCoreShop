@@ -1,5 +1,5 @@
 ﻿using CoreShop.Data;
-using CoreShop.Models.StoreViewModels;
+using CoreShop.Models.ShoppingCartViewModel;
 using Microsoft.AspNetCore.Mvc;
 using System.Linq;
 
@@ -16,7 +16,7 @@ namespace CoreShop.Controllers
 
         public ViewResult Index()
         {
-            var viewmodel = new ProductsOnSaleGroup
+            var viewmodel = new ProductsOnSaleViewModel
             {
                 ProductsOnSale = _ctx.Products
                                      .Where(p => p.OnSale)

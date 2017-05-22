@@ -1,5 +1,5 @@
 ﻿using CoreShop.Data;
-using CoreShop.Models.StoreViewModels;
+using CoreShop.Models.ShoppingCartViewModel;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -35,10 +35,10 @@ namespace CoreShop.Controllers
 
             ViewData["SearchFilter"] = search;  // KEEP SEARCH FILTER WHILE "PAGING"
 
-            IQueryable<CustomerOrdersGroup> groupQuery = 
+            IQueryable<CustomerOrdersViewModel> groupQuery = 
             from item in _ctx.Orders
             group item by item.Customer.CustomerNumber into orderGroup
-            select new CustomerOrdersGroup()
+            select new CustomerOrdersViewModel()
             {
                 CustomerNumber = orderGroup.Key,
                 OrderCount = orderGroup.Count(),
@@ -68,7 +68,7 @@ namespace CoreShop.Controllers
             int itemsOnPage = 6;
 
             // CONVERT QUERY TO SINGLE PAGE OF ITEMS IN COLLECTION THAT SUPPORTS PAGING
-            return View(await PageList<CustomerOrdersGroup>.CreateAsync(groupQuery.AsNoTracking(),
+            return View(await PageList<CustomerOrdersViewModel>.CreateAsync(groupQuery.AsNoTracking(),
                                                                         pageIndex ?? 1, // IF NULL, RETURN 1 - ELSE RETURN PAGEINDEX VALUE
                                                                         itemsOnPage));
 
