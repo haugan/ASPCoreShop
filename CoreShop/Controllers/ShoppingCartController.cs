@@ -1,6 +1,6 @@
 using CoreShop.Data;
 using CoreShop.Models;
-using CoreShop.Models.ShoppingCartViewModel;
+using CoreShop.Models.StoreViewModels;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Linq;
@@ -38,7 +38,7 @@ namespace CoreShop.Controllers
             var currentCartItems = _cart.GetItems();
             _cart.Items = currentCartItems;
 
-            var cartVM = new CartTotalViewModel
+            var cartVM = new ShoppingCartTotalGroup
             {
                 Cart = _cart,
                 CartTotal = _cart.GetTotal()
