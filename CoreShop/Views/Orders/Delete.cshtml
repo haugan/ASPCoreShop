@@ -1,0 +1,33 @@
+@model CoreShop.Models.Order
+
+@{
+    ViewData["Title"] = "Delete";
+}
+
+<h3>Are you sure you want to delete this order?</h3>
+
+<div>
+    <hr />
+    <dl class="dl-horizontal">
+        <input type="hidden" asp-for="OrderID" />
+        <!--ORDER #-->
+        <dt>@Html.DisplayNameFor(model => model.OrderNumber)</dt>
+        <dd>@Html.DisplayFor(model => model.OrderNumber)</dd>
+        <!--CUSTOMER #-->
+        <dt>@Html.DisplayNameFor(model => model.Customer.CustomerNumber)</dt>
+        <dd><a asp-controller="Customers" asp-action="Details" asp-route-id="@Model.CustomerID">@Html.DisplayFor(model => model.Customer.CustomerNumber)</a></dd>
+        <!--ORDER DATE-->
+        <dt>@Html.DisplayNameFor(model => model.OrderDate)</dt>
+        <dd>@Html.DisplayFor(model => model.OrderDate)</dd>
+        <!--ORDER STATUS-->
+        <dt>@Html.DisplayNameFor(model => model.Status)</dt>
+        <dd>@Html.DisplayFor(model => model.Status)</dd>
+    </dl>
+    
+    <form asp-action="Delete">
+        <div class="form-actions no-color">
+            <input type="submit" value="Delete" class="btn btn-danger" /> |
+            <a asp-action="Index">Back to index</a>
+        </div>
+    </form>
+</div>

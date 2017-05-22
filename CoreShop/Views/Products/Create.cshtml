@@ -1,0 +1,112 @@
+@model CoreShop.Models.Product
+
+@{
+    ViewData["Title"] = "Create product";
+}
+
+<h3>Add new product</h3>
+
+<form asp-action="Create">
+    <div class="form-horizontal">
+        <hr />
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+        <!--PRODUCT #-->
+        <div class="form-group">
+            <label asp-for="ProductNumber" class="col-md-2 control-label"></label>
+            <div class="col-md-10">
+                <input asp-for="ProductNumber" type="text" class="form-control"/>
+                <span asp-validation-for="ProductNumber" class="text-danger"></span>
+            </div>
+        </div>
+
+        <!--PRICE-->
+        <div class="form-group">
+            <label asp-for="Price" class="col-md-2 control-label"></label>
+            <div class="col-md-10">
+                <input asp-for="Price" type="number" class="form-control" />
+                <span asp-validation-for="Price" class="text-danger"></span>
+            </div>
+        </div>
+
+        <!--ON SALE-->
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-10">
+                <div class="checkbox">
+                    <input asp-for="OnSale" type="checkbox"/>
+                    <label asp-for="OnSale"></label>
+                </div>
+            </div>
+        </div>
+
+        <!--NAME-->
+        <div class="form-group">
+            <label asp-for="Name" class="col-md-2 control-label"></label>
+            <div class="col-md-10">
+                <input asp-for="Name" type="text" class="form-control" />
+                <span asp-validation-for="Name" class="text-danger"></span>
+            </div>
+        </div>
+
+        <!--IMGURL 1-->
+        <div class="form-group">
+            <label asp-for="ImgURL1" class="col-md-2 control-label"></label>
+            <div class="col-md-10">
+                <input asp-for="ImgURL1" type="text" class="form-control" />
+                <span asp-validation-for="ImgURL1" class="text-danger"></span>
+            </div>
+        </div>
+
+        <!--IMGURL 2-->
+        <div class="form-group">
+            <label asp-for="ImgURL2" class="col-md-2 control-label"></label>
+            <div class="col-md-10">
+                <input asp-for="ImgURL2" type="text" class="form-control" />
+                <span asp-validation-for="ImgURL2" class="text-danger"></span>
+            </div>
+        </div>
+
+        <!--IMGURL 3-->
+        <div class="form-group">
+            <label asp-for="ImgURL3" class="col-md-2 control-label"></label>
+            <div class="col-md-10">
+                <input asp-for="ImgURL3" type="text" class="form-control" />
+                <span asp-validation-for="ImgURL3" class="text-danger"></span>
+            </div>
+        </div>
+
+        <!--SHORT DESCRIPTION-->
+        <div class="form-group">
+            <label asp-for="DescriptionShort" class="col-md-2 control-label"></label>
+            <div class="col-md-10">
+                <textarea asp-for="DescriptionShort" type="text" rows="3" class="form-control"></textarea>
+                <span asp-validation-for="DescriptionShort" class="text-danger"></span>
+            </div>
+        </div>
+
+        <!--LONG DESCRIPTION-->
+        <div class="form-group">
+            <label asp-for="DescriptionLong" class="col-md-2 control-label"></label>
+            <div class="col-md-10">
+                <textarea asp-for="DescriptionLong" type="text" rows="6" class="form-control"></textarea>
+                <span asp-validation-for="DescriptionLong" class="text-danger"></span>
+            </div>
+        </div>
+
+        <!--SUBMIT-->
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-10">
+                <input type="submit" value="Add" class="btn btn-success" />
+            </div>
+        </div>
+
+    </div>
+</form>
+
+<div>
+    <a asp-action="Index">Back to index</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

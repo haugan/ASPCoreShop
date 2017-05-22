@@ -1,0 +1,27 @@
+@model CoreShop.Models.OrderItem
+
+@{
+    ViewData["Title"] = "Order item details";
+}
+
+<h3>Order item details</h3>
+
+<div>
+    <hr />
+
+    <dl class="dl-horizontal">
+        <!--ORDER #-->
+        <dt>Order #</dt>
+        <dd><a asp-controller="Orders" asp-action="Details" asp-route-id="@Model.OrderID">@Html.DisplayFor(model => model.Order.OrderNumber)</a></dd>
+        <!--PRODUCT #-->
+        <dt>Product #</dt>
+        <dd><a asp-controller="Products" asp-action="Details" asp-route-id="@Model.ProductID">@Html.DisplayFor(model => model.Product.ProductNumber)</a></dd>
+        <!--ITEM QUANTITY-->
+        <dt>@Html.DisplayNameFor(model => model.Quantity)</dt>
+        <dd>@Html.DisplayFor(model => model.Quantity)</dd>
+    </dl>
+</div>
+<div>
+    <a asp-action="Edit" asp-route-id="@Model.OrderItemID">Edit</a> |
+    <a asp-action="Index">Back to index</a>
+</div>

@@ -1,0 +1,67 @@
+@model CoreShop.Models.Order
+
+@{
+    ViewData["Title"] = "Edit";
+}
+
+<h3>Update order details</h3>
+
+<form asp-action="Edit">
+    <div class="form-horizontal">
+        <hr />
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        <input type="hidden" asp-for="OrderID" />
+
+        <!--ORDER #-->
+        <div class="form-group">
+            <label asp-for="OrderNumber" class="col-md-2 control-label"></label>
+            <div class="col-md-10">
+                <input asp-for="OrderNumber" class="form-control" />
+                <span asp-validation-for="OrderNumber" class="text-danger"></span>
+            </div>
+        </div>
+
+        <!--CUSTOMER #-->
+        <div class="form-group">
+            <label asp-for="CustomerID" class="control-label col-md-2"></label>
+            <div class="col-md-10">
+                <select asp-for="CustomerID" class="form-control" asp-items="ViewBag.CustomerNumber"></select>
+                <span asp-validation-for="CustomerID" class="text-danger"></span>
+            </div>
+        </div>
+
+        <!--ORDER DATE-->
+        <div class="form-group">
+            <label asp-for="OrderDate" class="col-md-2 control-label"></label>
+            <div class="col-md-10">
+                <input asp-for="OrderDate" class="form-control" />
+                <span asp-validation-for="OrderDate" class="text-danger"></span>
+            </div>
+        </div>
+
+        <!--ORDER STATUS-->
+        <div class="form-group">
+            <label asp-for="Status" class="col-md-2 control-label"></label>
+            <div class="col-md-10">
+                <input asp-for="Status" class="form-control" />
+                <span asp-validation-for="Status" class="text-danger"></span>
+            </div>
+        </div>
+
+        <!--SUBMIT-->
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-10">
+                <input type="submit" value="Save" class="btn btn-success" />
+            </div>
+        </div>
+
+    </div>
+</form>
+
+<div>
+    <a asp-action="Index">Back to index</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

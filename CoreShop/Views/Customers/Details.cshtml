@@ -1,0 +1,49 @@
+@model CoreShop.Models.Customer
+
+@{
+    ViewData["Title"] = "Customer details";
+}
+
+<h2>Details</h2>
+
+<div>
+    <h4>Customer</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <!--CUSTOMER #-->
+        <dt>@Html.DisplayNameFor(c => c.CustomerNumber)</dt>
+        <dd>@Html.DisplayFor(c => c.CustomerNumber)</dd>
+        <!--FIRSTNAME-->
+        <dt>@Html.DisplayNameFor(c => c.Firstname)</dt>
+        <dd>@Html.DisplayFor(c => c.Firstname)</dd>
+        <!--LASTNAME-->
+        <dt>@Html.DisplayNameFor(c => c.Lastname)</dt>
+        <dd>@Html.DisplayFor(c => c.Lastname)</dd>
+        <!--EMAIL-->
+        <dt>@Html.DisplayNameFor(c => c.Email)</dt>
+        <dd>@Html.DisplayFor(c => c.Email)</dd>
+        <!--ORDERS-->
+        <dt>@Html.DisplayNameFor(c => c.Orders)</dt>
+        <dd>
+            <table class="table">
+                <tr>
+                    <th>Order #</th>
+                    <th>Status</th>
+                    <th>Total</th>
+                </tr>
+                @foreach (var order in Model.Orders)
+                {
+                    <tr>
+                        <td><a asp-controller="Orders" asp-action="Details" asp-route-id="@order.OrderID">@Html.DisplayFor(item => order.OrderNumber)</a></td>
+                        <td>@Html.DisplayFor(item => order.Status)</td>
+                        <td>-</td>
+                    </tr>
+                }
+            </table>
+        </dd>
+    </dl>
+</div>
+<div>
+    <a asp-action="Edit" asp-route-id="@Model.CustomerID">Edit</a> |
+    <a asp-action="Index">Back to index</a>
+</div>

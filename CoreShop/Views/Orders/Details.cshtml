@@ -1,0 +1,50 @@
+@model CoreShop.Models.Order
+
+@{
+    ViewData["Title"] = "Order details";
+}
+
+<h3>Order details</h3>
+
+<div>
+    <hr />
+    <dl class="dl-horizontal">
+        <!--ORDER #-->
+        <dt>@Html.DisplayNameFor(model => model.OrderNumber)</dt>
+        <dd>@Html.DisplayFor(model => model.OrderNumber)</dd>
+        <!--CUSTOMER #-->
+        <dt>@Html.DisplayNameFor(model => model.Customer.CustomerNumber)</dt>
+        <dd><a asp-controller="Customers" asp-action="Details" asp-route-id="@Model.CustomerID">@Html.DisplayFor(model => model.Customer.CustomerNumber)</a></dd>
+        <!--ORDER DATE-->
+        <dt>@Html.DisplayNameFor(model => model.OrderDate)</dt>
+        <dd>@Html.DisplayFor(model => model.OrderDate)</dd>
+        <!--ORDER STATUS-->
+        <dt>@Html.DisplayNameFor(model => model.Status)</dt>
+        <dd>@Html.DisplayFor(model => model.Status)</dd>
+        <dt>Total</dt> <!--TODO: IMPLEMENT-->
+        <dd>-</dd>
+        <!--ORDER ITEMS-->
+        <dt>@Html.DisplayNameFor(model => model.OrderItems)</dt>
+        <dd>
+            <table class="table">
+                <tr>
+                    <th>Product #</th>
+                    <th>Quantity</th>
+                    <th>Sub total</th>
+                </tr>
+                @foreach (var orderItem in Model.OrderItems)
+                {
+                    <tr>
+                        <td><a asp-controller="Products" asp-action="Details" asp-route-id="@orderItem.ProductID">@Html.DisplayFor(item => orderItem.Product.ProductNumber)</a></td>
+                        <td>@Html.DisplayFor(item => orderItem.Quantity)</td>
+                        <td>@((orderItem.Quantity * orderItem.Product.Price).ToString("c"))</td>
+                    </tr>
+                }
+            </table>
+        </dd>
+    </dl>
+</div>
+<div>
+    <a asp-action="Edit" asp-route-id="@Model.OrderID">Edit</a> |
+    <a asp-action="Index">Back to index</a>
+</div>

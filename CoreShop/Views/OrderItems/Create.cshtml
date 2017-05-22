@@ -1,0 +1,54 @@
+@model CoreShop.Models.OrderItem
+
+@{
+    ViewData["Title"] = "Create";
+}
+
+<h3>Add new order item</h3>
+
+<form asp-action="Create">
+    <div class="form-horizontal">
+        <hr />
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        
+        <!--ORDER #-->
+        <div class="form-group">
+            <label asp-for="Order.OrderNumber" class="col-md-2 control-label"></label>
+            <div class="col-md-10">
+                <select asp-for="OrderID"  asp-items="ViewBag.OrderNumber" class ="form-control"></select>
+            </div>
+        </div>
+
+        <!--PRODUCT #-->
+        <div class="form-group">
+            <label asp-for="Product.ProductNumber" class="col-md-2 control-label"></label>
+            <div class="col-md-10">
+                <select asp-for="ProductID" asp-items="ViewBag.ProductNumber" class ="form-control"></select>
+            </div>
+        </div>
+
+        <!--ITEM QUANTITY-->
+        <div class="form-group">
+            <label asp-for="Quantity" class="col-md-2 control-label"></label>
+            <div class="col-md-10">
+                <input asp-for="Quantity" class="form-control" />
+                <span asp-validation-for="Quantity" class="text-danger"></span>
+            </div>
+        </div>
+
+        <!--SUBMIT-->
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-10">
+                <input type="submit" value="Add" class="btn btn-success" />
+            </div>
+        </div>
+    </div>
+</form>
+
+<div>
+    <a asp-action="Index">Back to index</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

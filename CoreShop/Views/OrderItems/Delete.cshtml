@@ -1,0 +1,30 @@
+@model CoreShop.Models.OrderItem
+
+@{
+    ViewData["Title"] = "Delete";
+}
+
+<h3>Are you sure you want to delete this order item?</h3>
+
+<div>
+    <hr />
+    <dl class="dl-horizontal">
+        <input type="hidden" asp-for="OrderItemID" />
+        <!--ORDER #-->
+        <dt>@Html.DisplayNameFor(item => item.Order.OrderNumber)</dt>
+        <dd><a asp-controller="Orders" asp-action="Details" asp-route-id="@Model.OrderID">@Html.DisplayFor(item => item.Order.OrderNumber)</a></dd>
+        <!--PRODUCT #-->
+        <dt>@Html.DisplayNameFor(item => item.Product.ProductNumber)</dt>
+        <dd><a asp-controller="Products" asp-action="Details" asp-route-id="@Model.ProductID">@Html.DisplayFor(item => item.Product.ProductNumber)</a></dd>
+        <!--PRODUCT ITEM QUANTITY-->
+        <dt>@Html.DisplayNameFor(item => item.Quantity)</dt>
+        <dd>@Html.DisplayFor(item => item.Quantity)</dd>
+    </dl>
+    <!--SUBMIT-->
+    <form asp-action="Delete">
+        <div class="form-actions no-color">
+            <input type="submit" value="Delete" class="btn btn-danger" /> |
+            <a asp-action="Index">Back to index</a>
+        </div>
+    </form>
+</div>

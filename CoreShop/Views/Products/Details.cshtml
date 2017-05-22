@@ -1,0 +1,45 @@
+@model CoreShop.Models.Product
+
+@{
+    ViewData["Title"] = "Product details";
+}
+
+<h2>Details</h2>
+
+<div>
+    <h4>Product</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <!--PRODUCT #-->
+        <dt>@Html.DisplayNameFor(model => model.ProductNumber)</dt>
+        <dd>@Html.DisplayFor(model => model.ProductNumber)</dd>
+        <!--PRICE-->
+        <dt>@Html.DisplayNameFor(model => model.Price)</dt>
+        <dd>@Html.DisplayFor(model => model.Price)</dd>
+        <!--ON SALE-->
+        <dt>@Html.DisplayNameFor(model => model.OnSale)</dt>
+        <dd>@Html.DisplayFor(model => model.OnSale)</dd>
+        <!--PRODUCT NAME-->
+        <dt>@Html.DisplayNameFor(model => model.Name)</dt>
+        <dd>@Html.DisplayFor(model => model.Name)</dd>
+        <!--IMAGE 1-->
+        <dt>@Html.DisplayNameFor(model => model.ImgURL1)</dt>
+        <dd>@Html.DisplayFor(model => model.ImgURL1)</dd>
+        <!--IMAGE 2-->
+        <dt>@Html.DisplayNameFor(model => model.ImgURL2)</dt>
+        <dd>@Html.DisplayFor(model => model.ImgURL2)</dd>
+        <!--IMAGE 3-->
+        <dt>@Html.DisplayNameFor(model => model.ImgURL3)</dt>
+        <dd>@Html.DisplayFor(model => model.ImgURL3)</dd>
+        <!--SHORT DESCRIPTION-->
+        <dt>@Html.DisplayNameFor(model => model.DescriptionShort)</dt>
+        <dd>@Html.DisplayFor(model => model.DescriptionShort)</dd>
+        <!--LONG DESCRIPTION-->
+        <dt>@Html.DisplayNameFor(model => model.DescriptionLong)</dt>
+        <dd>@Html.DisplayFor(model => model.DescriptionLong)</dd>
+    </dl>
+</div>
+<div>
+    <a asp-action="Edit" asp-route-id="@Model.ProductID">Edit</a> |
+    <a asp-action="Index">Back to index</a>
+</div>

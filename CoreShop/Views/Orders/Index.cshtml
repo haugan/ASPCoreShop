@@ -1,0 +1,84 @@
+@model PageList<CoreShop.Models.Order>
+
+@{
+    ViewData["Title"] = "Orders";
+}
+
+<h2>Orders</h2>
+
+<p>
+    <a asp-action="Create">Add new order</a>
+</p>
+
+<!--SEARCH FIELD-->
+<form asp-action="Index" method="GET">
+    <div class="form-actions no-color">
+        <p>
+            <input type="text" name="filter" value="@ViewData["SearchFilter"]" />
+            <input type="submit" value="Search" class="btn btn-default" /> |
+            <a asp-action="Index">View all</a>
+        </p>
+    </div>
+</form>
+
+<!--INDEX TABLE-->
+<table class="table">
+    <thead>
+        <tr>
+            <th><a asp-action="Index" asp-route-sortOrder="@ViewData["SortOrderNumber"]" asp-route-filter="@ViewData["SearchFilter"]">Order #</a></th>
+            <th><a asp-action="Index" asp-route-sortOrder="@ViewData["SortCustomerNumber"]" asp-route-filter="@ViewData["SearchFilter"]">Customer #</a></th> 
+            <th><a asp-action="Index" asp-route-sortOrder="@ViewData["SortOrderDate"]" asp-route-filter="@ViewData["SearchFilter"]">Date</a></th>
+            <th><a asp-action="Index" asp-route-sortOrder="@ViewData["SortStatus"]" asp-route-filter="@ViewData["SearchFilter"]">Status</a></th>
+            <th>Total</th> 
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var order in Model)
+        {
+            var totalPrice = 0;
+            var orderItems = order.OrderItems.ToList();
+            foreach (var item in orderItems)
+            {
+                totalPrice += item.Product.Price * item.Quantity;
+            }
+
+            <tr>
+                <td>@Html.DisplayFor(item => order.OrderNumber)</td>
+                <td><a asp-controller="Customers" asp-action="Details" asp-route-id="@order.CustomerID">@Html.DisplayFor(item => order.Customer.CustomerNumber)</a></td>
+                <td>@Html.DisplayFor(item => order.OrderDate)</td>
+                <td>@Html.DisplayFor(item => order.Status)</td>
+                <td>@(totalPrice.ToString("c"))</td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@order.OrderID">Edit</a> |
+                    <a asp-action="Details" asp-route-id="@order.OrderID">Details</a> |
+                    <a asp-action="Delete" asp-route-id="@order.OrderID">Delete</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@{
+    var prevDisabled = !Model.HasPrevious ? "disabled" : "";
+    var nextDisabled = !Model.HasNext ? "disabled" : "";
+}
+
+<!--NAVIGATION BUTTONS-->
+<a class="btn btn-default @prevDisabled"
+   asp-action="Index"
+   asp-route-sortOrder="@ViewData["SortOrder"]"
+   asp-route-filter="@ViewData["SearchFilter"]"
+   asp-route-pageIndex="@(Model.Index - 1)">
+
+   <span class="glyphicon glyphicon-menu-left" aria-hidden="true"></span>
+</a>
+
+<a class="btn btn-default @nextDisabled"
+   asp-action="Index"
+   asp-route-sortOrder="@ViewData["SortOrder"]"
+   asp-route-filter="@ViewData["SearchFilter"]"
+   asp-route-pageIndex="@(Model.Index + 1)">
+
+   <span class="glyphicon glyphicon-menu-right" aria-hidden="true"></span>
+</a>

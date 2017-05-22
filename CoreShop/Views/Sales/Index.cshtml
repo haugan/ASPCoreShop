@@ -1,0 +1,64 @@
+﻿@model PageList<CoreShop.Models.StoreViewModels.CustomerOrdersGroup>
+
+@{
+    ViewData["Title"] = "Sales index";
+}
+
+<h2>Sales</h2>
+
+<!--SEARCH FIELD-->
+<form asp-action="Index" method="GET">
+    <div class="form-actions no-color">
+        <p>
+            <input type="text" name="filter" value="@ViewData["SearchFilter"]" />
+            <input type="submit" value="Search" class="btn btn-default" /> |
+            <a asp-action="Index">View all</a>
+        </p>
+    </div>
+</form>
+
+<!--INDEX TABLE-->
+<table class="table">
+    <thead>
+        <tr>
+            <th><a asp-action="Index" asp-route-sortOrder="@ViewData["SortCustomerNumber"]" asp-route-filter="@ViewData["SearchFilter"]">Customer #</a></th>
+            <th><a asp-action="Index" asp-route-sortOrder="@ViewData["SortOrderCount"]" asp-route-filter="@ViewData["SearchFilter"]">Order count</a></th>
+            <th>Total quantity</th> <!--TODO: IMPLEMENT-->
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@Html.DisplayFor(modelItem => item.CustomerNumber)</td>
+                <td>@Html.DisplayFor(modelItem => item.OrderCount)</td>
+                <td>-</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@{
+    var prevDisabled = !Model.HasPrevious ? "disabled" : "";
+    var nextDisabled = !Model.HasNext ? "disabled" : "";
+}
+
+<!--NAVIGATION BUTTONS-->
+<a class="btn btn-default @prevDisabled"
+   asp-action="Index"
+   asp-route-sortOrder="@ViewData["SortOrder"]"
+   asp-route-filter="@ViewData["SearchFilter"]"
+   asp-route-pageIndex="@(Model.Index - 1)">
+
+    <span class="glyphicon glyphicon-menu-left" aria-hidden="true"></span>
+</a>
+
+<a class="btn btn-default @nextDisabled"
+   asp-action="Index"
+   asp-route-sortOrder="@ViewData["SortOrder"]"
+   asp-route-filter="@ViewData["SearchFilter"]"
+   asp-route-pageIndex="@(Model.Index + 1)">
+
+    <span class="glyphicon glyphicon-menu-right" aria-hidden="true"></span>
+</a>

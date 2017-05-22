@@ -1,0 +1,71 @@
+@model PageList<CoreShop.Models.Product>
+@{
+    ViewData["Title"] = "Product index";
+}
+
+<h2>Products</h2>
+<p>
+    <a asp-action="Create">Add new product</a>
+</p>
+
+<!--SEARCH FIELD-->
+<form asp-action="Index" method="GET">
+    <div class="form-actions no-color">
+        <p>
+            <input type="text" name="filter" value="@ViewData["SearchFilter"]" />
+            <input type="submit" value="Search" class="btn btn-default" /> |
+            <a asp-action="Index">View all</a>
+        </p>
+    </div>
+</form>
+
+<!--INDEX TABLE-->
+<table class="table">
+    <thead>
+        <tr>
+            <th><a asp-action="Index" asp-route-sortOrder="@ViewData["SortProductNumber"]" asp-route-filter="@ViewData["SearchFilter"]">Product #</a></th>
+            <th><a asp-action="Index" asp-route-sortOrder="@ViewData["SortPrice"]" asp-route-filter="@ViewData["SearchFilter"]">Price</a></th>
+            <th><a asp-action="Index" asp-route-sortOrder="@ViewData["SortName"]" asp-route-filter="@ViewData["SearchFilter"]">Name</a></th>
+            <th>OnSale</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var product in Model)
+            {
+            <tr>
+                <td>@Html.DisplayFor(item => product.ProductNumber)</td>
+                <td>@Html.DisplayFor(item => product.Price)</td>
+                <td>@Html.DisplayFor(item => product.Name)</td>
+                <td>@Html.DisplayFor(item => product.OnSale)</td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@product.ProductID">Edit</a> |
+                    <a asp-action="Details" asp-route-id="@product.ProductID">Details</a> |
+                    <a asp-action="Delete" asp-route-id="@product.ProductID">Delete</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<!--NAVIGATION BUTTONS-->
+@{
+    var prevDisabled = !Model.HasPrevious ? "disabled" : "";
+    var nextDisabled = !Model.HasNext ? "disabled" : "";
+}
+<a class="btn btn-default @prevDisabled"
+   asp-action="Index"
+   asp-route-sortOrder="@ViewData["SortOrder"]"
+   asp-route-filter="@ViewData["SearchFilter"]"
+   asp-route-pageIndex="@(Model.Index - 1)">
+
+    <span class="glyphicon glyphicon-menu-left" aria-hidden="true"></span>
+</a>
+<a class="btn btn-default @nextDisabled"
+   asp-action="Index"
+   asp-route-sortOrder="@ViewData["SortOrder"]"
+   asp-route-filter="@ViewData["SearchFilter"]"
+   asp-route-pageIndex="@(Model.Index + 1)">
+
+    <span class="glyphicon glyphicon-menu-right" aria-hidden="true"></span>
+</a>
