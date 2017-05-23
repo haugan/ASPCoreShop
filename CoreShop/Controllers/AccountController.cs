@@ -41,21 +41,17 @@ namespace CoreShop.Controllers
             _logger = loggerFactory.CreateLogger<AccountController>();
         }
 
-        //
-        // GET: /Account/Login
         [HttpGet]
         [AllowAnonymous]
         public async Task<IActionResult> Login(string returnUrl = null)
         {
-            // Clear the existing external cookie to ensure a clean login process
+            // CLEAR EXISTING COOKIE FOR CLEAN LOGIN PROCESS
             await HttpContext.Authentication.SignOutAsync(_externalCookieScheme);
 
             ViewData["ReturnUrl"] = returnUrl;
             return View();
         }
 
-        //
-        // POST: /Account/Login
         [HttpPost]
         [AllowAnonymous]
         [ValidateAntiForgeryToken]
@@ -64,8 +60,18 @@ namespace CoreShop.Controllers
             ViewData["ReturnUrl"] = returnUrl;
             if (ModelState.IsValid)
             {
-                // This doesn't count login failures towards account lockout
-                // To enable password failures to trigger account lockout, set lockoutOnFailure: true
+                // REQUIRE CONFIRMED EMAIL BEFORE LOG IN
+                var user = await _userManager.FindByEmailAsync(model.Email);
+                if (user != null)
+                {
+                    if (!await _userManager.IsEmailConfirmedAsync(user))
+                    {
+                        ModelState.AddModelError(string.Empty, "Please check your email and confirm your account before logging in.");
+                        return View(model);
+                    }
+                }
+
+                // NO LOCK OUT ON FAILURE, LOG IN USER
                 var result = await _signInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, lockoutOnFailure: false);
                 if (result.Succeeded)
                 {
@@ -88,12 +94,10 @@ namespace CoreShop.Controllers
                 }
             }
 
-            // If we got this far, something failed, redisplay form
+            // SOMETHING FAILED, REDISPLAY FORM
             return View(model);
         }
 
-        //
-        // GET: /Account/Register
         [HttpGet]
         [AllowAnonymous]
         public IActionResult Register(string returnUrl = null)
@@ -102,67 +106,72 @@ namespace CoreShop.Controllers
             return View();
         }
 
-        //
-        // POST: /Account/Register
         [HttpPost]
         [AllowAnonymous]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Register(RegisterViewModel model, string returnUrl = null)
         {
             ViewData["ReturnUrl"] = returnUrl;
+
             if (ModelState.IsValid)
             {
-                var user = new ApplicationUser { UserName = model.Email, Email = model.Email };
-                var result = await _userManager.CreateAsync(user, model.Password);
+                var user = new ApplicationUser { UserName = model.Email,
+                                                            Email = model.Email }; // config new user
 
-                // TODO: CREATE USER IN ADMIN SYSTEM
+                var result = await _userManager.CreateAsync(user, 
+                                                            model.Password); // create new user
+
+                // TODO: CREATE ADMIN USER
+
                 if (result.Succeeded)
                 {
-                    // ENABLE ACCOUNT: https://go.microsoft.com/fwlink/?LinkID=532713
 
-                    // Send an email with this link
-                    //var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
-                    //var callbackUrl = Url.Action(nameof(ConfirmEmail), "Account", new { userId = user.Id, code = code }, protocol: HttpContext.Request.Scheme);
-                    //await _emailSender.SendEmailAsync(model.Email, "Confirm your account",
-                    //    $"Please confirm your account by clicking this link: <a href='{callbackUrl}'>link</a>");
+                    var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
 
-                    await _signInManager.SignInAsync(user, isPersistent: false);
+                    var callbackUrl = Url.Action(nameof(ConfirmEmail), 
+                                                 "Account", 
+                                                 new { userId = user.Id, code = code }, 
+                                                 protocol: HttpContext.Request.Scheme);
+
+                    await _emailSender.SendEmailAsync(model.Email, 
+                                                      "Confirm CoreSHOP account",
+                                                      $"Please confirm your CoreSHOP account by <a href='{callbackUrl}'>clicking here</a>");
+
+                    // PREVENT NEWLY REGISTERED USER AUTOMATICALLY LOGGING IN
+                    //await _signInManager.SignInAsync(user, isPersistent: false); // log in user, store cookie with claims, call SignInAsync() in Login()
+
                     _logger.LogInformation(3, "User created a new account with password.");
                     return RedirectToLocal(returnUrl);
                 }
+
                 AddErrors(result);
             }
 
-            // If we got this far, something failed, redisplay form
+            // SOMETHING FAILED, REDISPLAY FORM
             return View(model);
         }
 
-        //
-        // POST: /Account/Logout
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Logout()
         {
-            await _signInManager.SignOutAsync();
+            await _signInManager.SignOutAsync(); // clear user claims stored in cookie
             _logger.LogInformation(4, "User logged out.");
+
             return RedirectToAction(nameof(HomeController.Index), "Home");
         }
 
-        //
-        // POST: /Account/ExternalLogin
         [HttpPost]
         [AllowAnonymous]
         [ValidateAntiForgeryToken]
         public IActionResult ExternalLogin(string provider, string returnUrl = null)
         {
-            // Request a redirect to the external login provider.
+            // REQUEST REDIRECT TO EXTERNAL LOGIN PROVIDER
             var redirectUrl = Url.Action(nameof(ExternalLoginCallback), "Account", new { ReturnUrl = returnUrl });
             var properties = _signInManager.ConfigureExternalAuthenticationProperties(provider, redirectUrl);
             return Challenge(properties, provider);
         }
 
-        //
-        // GET: /Account/ExternalLoginCallback
         [HttpGet]
         [AllowAnonymous]
         public async Task<IActionResult> ExternalLoginCallback(string returnUrl = null, string remoteError = null)
@@ -178,7 +187,7 @@ namespace CoreShop.Controllers
                 return RedirectToAction(nameof(Login));
             }
 
-            // Sign in the user with this external login provider if the user already has a login.
+            // IF USER ALREADY HAS LOGIN, SIGN IN WITH EXTERNAL PROVIDER
             var result = await _signInManager.ExternalLoginSignInAsync(info.LoginProvider, info.ProviderKey, isPersistent: false);
             if (result.Succeeded)
             {
@@ -195,7 +204,7 @@ namespace CoreShop.Controllers
             }
             else
             {
-                // If the user does not have an account, then ask the user to create an account.
+                // IF USER HAS NO ACCOUNT, ASK TO CREATE ONE
                 ViewData["ReturnUrl"] = returnUrl;
                 ViewData["LoginProvider"] = info.LoginProvider;
                 var email = info.Principal.FindFirstValue(ClaimTypes.Email);
@@ -203,8 +212,6 @@ namespace CoreShop.Controllers
             }
         }
 
-        //
-        // POST: /Account/ExternalLoginConfirmation
         [HttpPost]
         [AllowAnonymous]
         [ValidateAntiForgeryToken]
@@ -212,7 +219,7 @@ namespace CoreShop.Controllers
         {
             if (ModelState.IsValid)
             {
-                // Get the information about the user from the external login provider
+                // GET USER INFO FROM EXTERNAL PROVIDER
                 var info = await _signInManager.GetExternalLoginInfoAsync();
                 if (info == null)
                 {
@@ -237,7 +244,6 @@ namespace CoreShop.Controllers
             return View(model);
         }
 
-        // GET: /Account/ConfirmEmail
         [HttpGet]
         [AllowAnonymous]
         public async Task<IActionResult> ConfirmEmail(string userId, string code)
@@ -255,8 +261,6 @@ namespace CoreShop.Controllers
             return View(result.Succeeded ? "ConfirmEmail" : "Error");
         }
 
-        //
-        // GET: /Account/ForgotPassword
         [HttpGet]
         [AllowAnonymous]
         public IActionResult ForgotPassword()
@@ -264,8 +268,6 @@ namespace CoreShop.Controllers
             return View();
         }
 
-        //
-        // POST: /Account/ForgotPassword
         [HttpPost]
         [AllowAnonymous]
         [ValidateAntiForgeryToken]
@@ -274,27 +276,33 @@ namespace CoreShop.Controllers
             if (ModelState.IsValid)
             {
                 var user = await _userManager.FindByEmailAsync(model.Email);
+
                 if (user == null || !(await _userManager.IsEmailConfirmedAsync(user)))
                 {
-                    // Don't reveal that the user does not exist or is not confirmed
+                    // IF USER DOESN'T EXIST, OR PASSWORD ISN'T CONFIRMED - DON'T REVEAL IT
                     return View("ForgotPasswordConfirmation");
                 }
 
-                // For more information on how to enable account confirmation and password reset please visit https://go.microsoft.com/fwlink/?LinkID=532713
-                // Send an email with this link
-                //var code = await _userManager.GeneratePasswordResetTokenAsync(user);
-                //var callbackUrl = Url.Action(nameof(ResetPassword), "Account", new { userId = user.Id, code = code }, protocol: HttpContext.Request.Scheme);
-                //await _emailSender.SendEmailAsync(model.Email, "Reset Password",
-                //   $"Please reset your password by clicking here: <a href='{callbackUrl}'>link</a>");
-                //return View("ForgotPasswordConfirmation");
+                // SEND PASSWORD RESET EMAIL
+                var code = await _userManager.GeneratePasswordResetTokenAsync(user);
+
+                var callbackUrl = Url.Action(nameof(ResetPassword), 
+                                             "Account", 
+                                             new { userId = user.Id,
+                                                   code = code }, 
+                                                   protocol: HttpContext.Request.Scheme);
+
+                await _emailSender.SendEmailAsync(model.Email, 
+                                                  "Reset CoreSHOP password",
+                                                  $"Please reset your password by <a href='{callbackUrl}'>clicking here</a>");
+
+                return View("ForgotPasswordConfirmation");
             }
 
-            // If we got this far, something failed, redisplay form
+            // SOMETHING FAILED, REDISPLAY FORM
             return View(model);
         }
 
-        //
-        // GET: /Account/ForgotPasswordConfirmation
         [HttpGet]
         [AllowAnonymous]
         public IActionResult ForgotPasswordConfirmation()
@@ -302,8 +310,6 @@ namespace CoreShop.Controllers
             return View();
         }
 
-        //
-        // GET: /Account/ResetPassword
         [HttpGet]
         [AllowAnonymous]
         public IActionResult ResetPassword(string code = null)
@@ -311,8 +317,6 @@ namespace CoreShop.Controllers
             return code == null ? View("Error") : View();
         }
 
-        //
-        // POST: /Account/ResetPassword
         [HttpPost]
         [AllowAnonymous]
         [ValidateAntiForgeryToken]
@@ -325,7 +329,7 @@ namespace CoreShop.Controllers
             var user = await _userManager.FindByEmailAsync(model.Email);
             if (user == null)
             {
-                // Don't reveal that the user does not exist
+                // IF USER DOESN'T EXIST, KEEP IT SECRET
                 return RedirectToAction(nameof(AccountController.ResetPasswordConfirmation), "Account");
             }
             var result = await _userManager.ResetPasswordAsync(user, model.Code, model.Password);
@@ -337,8 +341,6 @@ namespace CoreShop.Controllers
             return View();
         }
 
-        //
-        // GET: /Account/ResetPasswordConfirmation
         [HttpGet]
         [AllowAnonymous]
         public IActionResult ResetPasswordConfirmation()
@@ -346,8 +348,6 @@ namespace CoreShop.Controllers
             return View();
         }
 
-        //
-        // GET: /Account/SendCode
         [HttpGet]
         [AllowAnonymous]
         public async Task<ActionResult> SendCode(string returnUrl = null, bool rememberMe = false)
@@ -362,8 +362,6 @@ namespace CoreShop.Controllers
             return View(new SendCodeViewModel { Providers = factorOptions, ReturnUrl = returnUrl, RememberMe = rememberMe });
         }
 
-        //
-        // POST: /Account/SendCode
         [HttpPost]
         [AllowAnonymous]
         [ValidateAntiForgeryToken]
@@ -380,7 +378,7 @@ namespace CoreShop.Controllers
                 return View("Error");
             }
 
-            // Generate the token and send it
+            // GENERATE AND SEND TOKEN
             var code = await _userManager.GenerateTwoFactorTokenAsync(user, model.SelectedProvider);
             if (string.IsNullOrWhiteSpace(code))
             {
@@ -397,16 +395,17 @@ namespace CoreShop.Controllers
                 await _smsSender.SendSmsAsync(await _userManager.GetPhoneNumberAsync(user), message);
             }
 
-            return RedirectToAction(nameof(VerifyCode), new { Provider = model.SelectedProvider, ReturnUrl = model.ReturnUrl, RememberMe = model.RememberMe });
+            return RedirectToAction(nameof(VerifyCode), 
+                                    new { Provider = model.SelectedProvider,
+                                          ReturnUrl = model.ReturnUrl,
+                                          RememberMe = model.RememberMe });
         }
 
-        //
-        // GET: /Account/VerifyCode
         [HttpGet]
         [AllowAnonymous]
         public async Task<IActionResult> VerifyCode(string provider, bool rememberMe, string returnUrl = null)
         {
-            // Require that the user has already logged in via username/password or external login
+            // REQUIRE LOGGED IN USER
             var user = await _signInManager.GetTwoFactorAuthenticationUserAsync();
             if (user == null)
             {
@@ -415,8 +414,6 @@ namespace CoreShop.Controllers
             return View(new VerifyCodeViewModel { Provider = provider, ReturnUrl = returnUrl, RememberMe = rememberMe });
         }
 
-        //
-        // POST: /Account/VerifyCode
         [HttpPost]
         [AllowAnonymous]
         [ValidateAntiForgeryToken]
@@ -427,9 +424,8 @@ namespace CoreShop.Controllers
                 return View(model);
             }
 
-            // The following code protects for brute force attacks against the two factor codes.
-            // If a user enters incorrect codes for a specified amount of time then the user account
-            // will be locked out for a specified amount of time.
+            // PROTECT AGAINST BRUTE FORCE ATTACKS
+            // IF USER ENTERS WRONG TWO FACTOR CODES, LOCK ACCCOUNT FOR SOME TIME
             var result = await _signInManager.TwoFactorSignInAsync(model.Provider, model.Code, model.RememberMe, model.RememberBrowser);
             if (result.Succeeded)
             {
@@ -447,8 +443,6 @@ namespace CoreShop.Controllers
             }
         }
 
-        //
-        // GET /Account/AccessDenied
         [HttpGet]
         public IActionResult AccessDenied()
         {

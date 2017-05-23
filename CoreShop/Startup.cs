@@ -9,6 +9,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using System;
 
 namespace CoreShop
 {
@@ -24,8 +25,7 @@ namespace CoreShop
 
             if (env.IsDevelopment())
             {
-                // For more details on using the user secret store see https://go.microsoft.com/fwlink/?LinkID=532709
-                builder.AddUserSecrets<Startup>();
+                builder.AddUserSecrets<Startup>(); // holds SendGrid key for user email verification
             }
 
             builder.AddEnvironmentVariables();
@@ -39,9 +39,35 @@ namespace CoreShop
             svc.AddDbContext<ApplicationDbContext>(options =>
                                                    options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
 
-            svc.AddIdentity<ApplicationUser, IdentityRole>()
+            // IDENTITY
+            svc.AddIdentity<ApplicationUser, IdentityRole>(config => 
+            {
+                config.SignIn.RequireConfirmedEmail = true;
+            })
                .AddEntityFrameworkStores<ApplicationDbContext>()
                .AddDefaultTokenProviders();
+
+            svc.Configure<IdentityOptions>(options =>
+            {
+                // PASSWORD CONFIG
+                options.Password.RequireDigit = false;
+                options.Password.RequiredLength = 3;
+                options.Password.RequireNonAlphanumeric = false;
+                options.Password.RequireUppercase = false;
+                options.Password.RequireLowercase = false;
+
+                // LOCKOUT CONFIG
+                options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(5);
+                options.Lockout.MaxFailedAccessAttempts = 10;
+
+                // COOKIE CONFIG
+                options.Cookies.ApplicationCookie.ExpireTimeSpan = TimeSpan.FromDays(150);
+                options.Cookies.ApplicationCookie.LoginPath = "/Account/LogIn";
+                options.Cookies.ApplicationCookie.LogoutPath = "/Account/LogOut";
+
+                // USER CONFIG
+                options.User.RequireUniqueEmail = false;
+            });
 
             svc.AddMvc();
             svc.AddMemoryCache();
@@ -52,6 +78,9 @@ namespace CoreShop
             svc.AddTransient<ISmsSender, AuthMessageSender>();
             svc.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             svc.AddScoped<ShoppingCart>(svcProvider => ShoppingCart.GetCart(svcProvider));
+
+            // SENDGRID (USER EMAIL VERIFICATION)
+            svc.Configure<AuthMessageSenderOptions>(Configuration);
         }
 
         // ADD MIDDLEWARE COMPONENTS TO HTTP REQUEST PIPELINE

@@ -6,15 +6,6 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 
-/*
-
-    Denne klassen bør oppdatere Order, OrderItem, 
-    hver gang et produkt legges til eller fjernes fra ShoppingCart.
-
-    Når Checkout trykkes i index-View - bør Ordre lagres i database.
- 
-*/
-
 namespace CoreShop.Controllers
 {
     public class ShoppingCartController : Controller
@@ -57,11 +48,16 @@ namespace CoreShop.Controllers
             {
                 _cart.AddItem(product, 1);
 
-                // CREATION OF CUSTOMER, ORDER, AND ORDER ITEM DUMMY DATA
+
+
+                // FIKS DETTE OG FINN UT HVOR NYE CUSTOMER, ORDER, OG ORDER ITEMS SKAL INSTANSIERES !!!
+
                 //await CreateNewCustomer();
                 //await CreateNewOrder();
                 //await CreateNewOrderItem(product, 1);
                 //await UpdateOrderItemQuantity(product, 1);
+
+
             }
 
             return RedirectToAction("Index");
