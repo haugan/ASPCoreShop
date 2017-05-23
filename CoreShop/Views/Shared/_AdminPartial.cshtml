@@ -1,0 +1,21 @@
+﻿@using Microsoft.AspNetCore.Identity
+@using CoreShop.Models
+
+@inject SignInManager<ApplicationUser> SignInManager
+@inject UserManager<ApplicationUser> UserManager
+
+@if (SignInManager.IsSignedIn(User))
+{
+    <li class="dropdown">
+        <a class="dropdown-toggle"
+           data-toggle="dropdown">Admin<b class="caret"></b></a>
+        <ul class="dropdown-menu">
+            <li><a asp-controller="Products" asp-action="Index">Products</a></li>
+            <li><a asp-controller="Customers" asp-action="Index">Customers</a></li>
+            <li><a asp-controller="Orders" asp-action="Index">Orders</a></li>
+            <li><a asp-controller="OrderItems" asp-action="Index">Order items</a></li>
+            <li role="separator" class="divider"></li>
+            <li><a asp-controller="Sales" asp-action="Index">View sales</a></li>
+        </ul>
+    </li>
+}
