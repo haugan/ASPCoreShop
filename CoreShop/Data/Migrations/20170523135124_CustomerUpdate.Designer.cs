@@ -8,9 +8,10 @@ using CoreShop.Data;
 namespace CoreShop.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20170523135124_CustomerUpdate")]
+    partial class CustomerUpdate
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
             modelBuilder
                 .HasAnnotation("ProductVersion", "1.1.2")
@@ -77,8 +78,6 @@ namespace CoreShop.Data.Migrations
                     b.Property<int>("CartItemID")
                         .ValueGeneratedOnAdd();
 
-                    b.Property<int>("CustomerID");
-
                     b.Property<int>("ProductID");
 
                     b.Property<int>("Quantity");
@@ -87,10 +86,7 @@ namespace CoreShop.Data.Migrations
 
                     b.HasKey("CartItemID");
 
-                    b.HasIndex("CustomerID");
-
-                    b.HasIndex("ProductID")
-                        .IsUnique();
+                    b.HasIndex("ProductID");
 
                     b.ToTable("CartItems");
                 });
@@ -296,14 +292,9 @@ namespace CoreShop.Data.Migrations
 
             modelBuilder.Entity("CoreShop.Models.CartItem", b =>
                 {
-                    b.HasOne("CoreShop.Models.Customer", "Customer")
-                        .WithMany()
-                        .HasForeignKey("CustomerID")
-                        .OnDelete(DeleteBehavior.Cascade);
-
                     b.HasOne("CoreShop.Models.Product", "Product")
-                        .WithOne("CartItem")
-                        .HasForeignKey("CoreShop.Models.CartItem", "ProductID")
+                        .WithMany()
+                        .HasForeignKey("ProductID")
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 

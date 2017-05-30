@@ -7,7 +7,6 @@ namespace CoreShop.Models
         [Display(Name="ID")]
         public int CartItemID { get; set; } // PRIMARY KEY
         public int ProductID { get; set; } // FOREIGN KEY
-
         public string ShoppingCartID { get; set; } // CART GUID
 
         [Required]

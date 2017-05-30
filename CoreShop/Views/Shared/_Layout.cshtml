@@ -44,6 +44,7 @@
                 <ul class="nav navbar-nav">
 
                     <!--ADMIN MENU-->
+                    @*@await  Html.PartialAsync("_AdminPartial")*@
                     <li class="dropdown">
                         <a class="dropdown-toggle"
                            data-toggle="dropdown">Admin<b class="caret"></b></a>
@@ -58,6 +59,7 @@
                     </li>
 
                     <!--USER MENU-->
+                    @*@await  Html.PartialAsync("_UserPartial")*@
                     <li class="dropdown">
                         <a class="dropdown-toggle"
                            data-toggle="dropdown">User<b class="caret"></b></a>
@@ -66,6 +68,9 @@
                             <li><a asp-controller="ShoppingCart" asp-action="Index">Cart</a></li>
                         </ul>
                     </li>
+
+                    <!--DYNAMIC SHOPPING CART ICON-->
+                    @await Component.InvokeAsync("ShoppingCartItemsCount")
 
                 </ul>
 

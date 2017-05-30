@@ -3,6 +3,8 @@ using CoreShop.Models;
 using CoreShop.Models.StoreViewModels;
 using Microsoft.AspNetCore.Mvc;
 using System;
+using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -12,10 +14,6 @@ namespace CoreShop.Controllers
     {
         private readonly ApplicationDbContext _ctx;
         private readonly ShoppingCart _cart;
-
-        private Customer _customer;
-        private Order _order;
-        private OrderItem _orderItem;
 
         public ShoppingCartController(ApplicationDbContext ctx, ShoppingCart cart)
         {
@@ -39,73 +37,16 @@ namespace CoreShop.Controllers
         }
 
         // ADD CHOSEN PRODUCT TO SHOPPING CART
-        public async Task<RedirectToActionResult> AddToCart(int id)
+        public RedirectToActionResult AddToCart(int id)
         {
-            var product = _ctx.Products
-                              .FirstOrDefault(p => p.ProductID == id);
+            var product = _ctx.Products.FirstOrDefault(p => p.ProductID == id);
 
             if (product != null)
             {
                 _cart.AddItem(product, 1);
-
-
-
-                // FIKS DETTE OG FINN UT HVOR NYE CUSTOMER, ORDER, OG ORDER ITEMS SKAL INSTANSIERES !!!
-
-                //await CreateNewCustomer();
-                //await CreateNewOrder();
-                //await CreateNewOrderItem(product, 1);
-                //await UpdateOrderItemQuantity(product, 1);
-
-
             }
 
             return RedirectToAction("Index");
-        }
-
-        private async Task CreateNewCustomer()
-        {
-            _customer = new Customer
-            {
-                CustomerNumber = "CR-0000",
-                Firstname = "xxxx",
-                Lastname = "xxxx",
-                Email = "xxx@xxx.net"
-            };
-            _ctx.Customers.Add(_customer);
-            await _ctx.SaveChangesAsync();
-        }
-
-        private async Task CreateNewOrder()
-        {
-            _order = new Order
-            {
-                CustomerID = _customer.CustomerID,
-                OrderNumber = "OR-0000",
-                OrderDate = DateTime.Today,
-                Status = Status.PENDING
-            };
-            _ctx.Orders.Add(_order);
-            await _ctx.SaveChangesAsync();
-        }
-
-        private async Task CreateNewOrderItem(Product product, int quantity)
-        {
-            _orderItem = new OrderItem
-            {
-                OrderID = _order.OrderID,
-                ProductID = product.ProductID,
-                Quantity = quantity
-            };
-            _ctx.OrderItems.Add(_orderItem);
-            await _ctx.SaveChangesAsync();
-        }
-
-        private async Task UpdateOrderItemQuantity(Product product, int quantity)
-        {
-            _orderItem.Quantity = quantity;
-            _ctx.OrderItems.Update(_orderItem);
-            await _ctx.SaveChangesAsync();
         }
 
         // REMOVE CHOSEN PRODUCT FROM SHOPPING CART
@@ -133,6 +74,44 @@ namespace CoreShop.Controllers
 
             _cart.Clear();
             return RedirectToAction("Index");
+        }
+
+        public async Task<IActionResult> Checkout()
+        {
+            // GET THE CUSTOMER ID
+            var cartID = _cart.GUID.ToString();
+
+            // CREATE RANDOM ORDER #
+            var orderNumber = "OR-" + Path.GetRandomFileName().Replace(".", "").Substring(0, 6).ToUpper();
+
+            // ADD NEW ORDER TO DATABASE
+            _ctx.Orders.Add(new Order
+            {
+                CustomerID = 0, // get customer id
+                OrderDate = DateTime.Today,
+                OrderNumber = orderNumber,
+                Status = Status.PENDING
+            });
+            await _ctx.SaveChangesAsync();
+
+            // GET ITEMS (PRODUCT + QUANTITY) FROM SHOPPING CART
+            var cartItems = _cart.GetItems();
+
+            // GET ORDER ID
+
+            // CREATE ORDER ITEMS
+            foreach (var item in cartItems)
+            {
+                _ctx.OrderItems.Add(new OrderItem
+                {
+                    OrderID = 0, // get order id
+                    ProductID = item.ProductID, 
+                    Quantity = item.Quantity 
+                });
+                await _ctx.SaveChangesAsync();
+            }
+
+            return View();
         }
     }
 }

@@ -2,7 +2,6 @@
 @{
     ViewData["Title"] = "Shopping cart";
 }
-
 <div class="page-header">
     <h1>Shopping cart</h1>
     <div class="alert alert-info" role="alert">
@@ -11,9 +10,7 @@
         </p>
     </div>
 </div>
-
 <table class="table table-striped">
-
     <thead>
         <tr>
             <th class="col-md-1"></th>
@@ -23,7 +20,6 @@
             <th class="col-md-1 text-right">Sub total</th>
         </tr>
     </thead>
-
     <tbody>
         @foreach (var cartItem in Model.Cart.Items)
         {
@@ -33,18 +29,14 @@
                        asp-action="RemoveFromCart"
                        asp-route-id="@cartItem.Product.ProductID"
                        asp-route-cartItem="@cartItem">
-
                         <span class="glyphicon glyphicon-minus-sign"></span>
                     </a>
-
                     <a asp-controller="ShoppingCart"
                        asp-action="AddToCart"
                        asp-route-id="@cartItem.Product.ProductID"
                        asp-route-cartItem="@cartItem">
-
                         <span class="glyphicon glyphicon-plus-sign"></span>
                     </a>
-
                 </td>
                 <td class="text-center">@cartItem.Quantity</td>
                 <td class="text-left">@cartItem.Product.ProductNumber</td>
@@ -53,24 +45,19 @@
             </tr>
         }
     </tbody>
-
     <tfoot>
         <tr>
             <td colspan="4" class="text-right"><b>Total</b></td>
             <td class="text-right"><b>@Model.CartTotal.ToString("c")</b></td>
         </tr>
     </tfoot>
-
 </table>
 
 <div class="text-right">
-
     <a class="btn btn-danger"
        asp-controller="ShoppingCart"
        asp-action="Clear">Clear</a>
-
     <a class="btn btn-success"
-       asp-controller="Orders"
-       asp-action="Index">Checkout</a>
-
+       asp-controller="ShoppingCart"
+       asp-action="Checkout">Checkout</a>
 </div>

@@ -45,9 +45,9 @@ namespace CoreShop.Models
             {
                 cartItem = new CartItem
                 {
-                    ShoppingCartID = GUID,
                     Product = product,
-                    Quantity = 1
+                    Quantity = 1,
+                    ShoppingCartID = GUID
                 };
 
                 _ctx.CartItems.Add(cartItem);
@@ -89,9 +89,9 @@ namespace CoreShop.Models
         public List<CartItem> GetItems()
         {
             return Items ?? (Items = _ctx.CartItems
-                                                 .Where(i => i.ShoppingCartID == GUID)
-                                                 .Include(i => i.Product)
-                                                 .ToList());
+                                         .Where(i => i.ShoppingCartID == GUID)
+                                         .Include(i => i.Product)
+                                         .ToList());
         }
 
         // CLEAR SHOPPING CART FOR ITEMS

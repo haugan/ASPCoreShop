@@ -8,9 +8,10 @@ using CoreShop.Data;
 namespace CoreShop.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20170523155111_CustomerCartItemsLink")]
+    partial class CustomerCartItemsLink
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
             modelBuilder
                 .HasAnnotation("ProductVersion", "1.1.2")
@@ -89,8 +90,7 @@ namespace CoreShop.Data.Migrations
 
                     b.HasIndex("CustomerID");
 
-                    b.HasIndex("ProductID")
-                        .IsUnique();
+                    b.HasIndex("ProductID");
 
                     b.ToTable("CartItems");
                 });
@@ -297,13 +297,13 @@ namespace CoreShop.Data.Migrations
             modelBuilder.Entity("CoreShop.Models.CartItem", b =>
                 {
                     b.HasOne("CoreShop.Models.Customer", "Customer")
-                        .WithMany()
+                        .WithMany("CartItems")
                         .HasForeignKey("CustomerID")
                         .OnDelete(DeleteBehavior.Cascade);
 
                     b.HasOne("CoreShop.Models.Product", "Product")
-                        .WithOne("CartItem")
-                        .HasForeignKey("CoreShop.Models.CartItem", "ProductID")
+                        .WithMany()
+                        .HasForeignKey("ProductID")
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 

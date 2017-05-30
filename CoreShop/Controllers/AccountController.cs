@@ -12,33 +12,30 @@ using Microsoft.Extensions.Options;
 using CoreShop.Models;
 using CoreShop.Models.AccountViewModels;
 using CoreShop.Services;
+using CoreShop.Data;
+using System.IO;
 
 namespace CoreShop.Controllers
 {
     [Authorize]
     public class AccountController : Controller
     {
+        private readonly ApplicationDbContext _ctx;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly IEmailSender _emailSender;
-        private readonly ISmsSender _smsSender;
-        private readonly ILogger _logger;
         private readonly string _externalCookieScheme;
 
-        public AccountController(
-            UserManager<ApplicationUser> userManager,
-            SignInManager<ApplicationUser> signInManager,
-            IOptions<IdentityCookieOptions> identityCookieOptions,
-            IEmailSender emailSender,
-            ISmsSender smsSender,
-            ILoggerFactory loggerFactory)
+        public AccountController(ApplicationDbContext ctx,
+                                 UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, 
+                                 IOptions<IdentityCookieOptions> identityCookieOptions,
+                                 IEmailSender emailSender)
         {
+            _ctx = ctx;
             _userManager = userManager;
             _signInManager = signInManager;
-            _externalCookieScheme = identityCookieOptions.Value.ExternalCookieAuthenticationScheme;
             _emailSender = emailSender;
-            _smsSender = smsSender;
-            _logger = loggerFactory.CreateLogger<AccountController>();
+            _externalCookieScheme = identityCookieOptions.Value.ExternalCookieAuthenticationScheme;
         }
 
         [HttpGet]
@@ -75,7 +72,6 @@ namespace CoreShop.Controllers
                 var result = await _signInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, lockoutOnFailure: false);
                 if (result.Succeeded)
                 {
-                    _logger.LogInformation(1, "User logged in.");
                     return RedirectToLocal(returnUrl);
                 }
                 if (result.RequiresTwoFactor)
@@ -84,7 +80,6 @@ namespace CoreShop.Controllers
                 }
                 if (result.IsLockedOut)
                 {
-                    _logger.LogWarning(2, "User account locked out.");
                     return View("Lockout");
                 }
                 else
@@ -116,12 +111,10 @@ namespace CoreShop.Controllers
             if (ModelState.IsValid)
             {
                 var user = new ApplicationUser { UserName = model.Email,
-                                                            Email = model.Email }; // config new user
+                                                 Email = model.Email }; // config new user
 
                 var result = await _userManager.CreateAsync(user, 
                                                             model.Password); // create new user
-
-                // TODO: CREATE ADMIN USER
 
                 if (result.Succeeded)
                 {
@@ -137,11 +130,19 @@ namespace CoreShop.Controllers
                                                       "Confirm CoreSHOP account",
                                                       $"Please confirm your CoreSHOP account by <a href='{callbackUrl}'>clicking here</a>");
 
-                    // PREVENT NEWLY REGISTERED USER AUTOMATICALLY LOGGING IN
-                    //await _signInManager.SignInAsync(user, isPersistent: false); // log in user, store cookie with claims, call SignInAsync() in Login()
+                    // CREATE RANDOM CUSTOMER #
+                    var customerNumber = "CU-" + Path.GetRandomFileName().Replace(".", "").Substring(0, 6).ToUpper();
+                    // ADD NEW CUSTOMER TO DATABASE
+                    _ctx.Customers.Add(new Customer
+                    {
+                        CustomerNumber = customerNumber,
+                        Firstname = model.Firstname,
+                        Lastname = model.Lastname,
+                        Email = model.Email
+                    });
+                    await _ctx.SaveChangesAsync();
 
-                    _logger.LogInformation(3, "User created a new account with password.");
-                    return RedirectToLocal(returnUrl);
+                    return RedirectToAction("ConfirmationSent", "Account");
                 }
 
                 AddErrors(result);
@@ -156,7 +157,6 @@ namespace CoreShop.Controllers
         public async Task<IActionResult> Logout()
         {
             await _signInManager.SignOutAsync(); // clear user claims stored in cookie
-            _logger.LogInformation(4, "User logged out.");
 
             return RedirectToAction(nameof(HomeController.Index), "Home");
         }
@@ -191,7 +191,6 @@ namespace CoreShop.Controllers
             var result = await _signInManager.ExternalLoginSignInAsync(info.LoginProvider, info.ProviderKey, isPersistent: false);
             if (result.Succeeded)
             {
-                _logger.LogInformation(5, "User logged in with {Name} provider.", info.LoginProvider);
                 return RedirectToLocal(returnUrl);
             }
             if (result.RequiresTwoFactor)
@@ -233,7 +232,6 @@ namespace CoreShop.Controllers
                     if (result.Succeeded)
                     {
                         await _signInManager.SignInAsync(user, isPersistent: false);
-                        _logger.LogInformation(6, "User created an account using {Name} provider.", info.LoginProvider);
                         return RedirectToLocal(returnUrl);
                     }
                 }
@@ -259,6 +257,13 @@ namespace CoreShop.Controllers
             }
             var result = await _userManager.ConfirmEmailAsync(user, code);
             return View(result.Succeeded ? "ConfirmEmail" : "Error");
+        }
+
+        [HttpGet]
+        [AllowAnonymous]
+        public IActionResult ConfirmationSent()
+        {
+            return View();
         }
 
         [HttpGet]
@@ -390,10 +395,6 @@ namespace CoreShop.Controllers
             {
                 await _emailSender.SendEmailAsync(await _userManager.GetEmailAsync(user), "Security Code", message);
             }
-            else if (model.SelectedProvider == "Phone")
-            {
-                await _smsSender.SendSmsAsync(await _userManager.GetPhoneNumberAsync(user), message);
-            }
 
             return RedirectToAction(nameof(VerifyCode), 
                                     new { Provider = model.SelectedProvider,
@@ -433,7 +434,6 @@ namespace CoreShop.Controllers
             }
             if (result.IsLockedOut)
             {
-                _logger.LogWarning(7, "User account locked out.");
                 return View("Lockout");
             }
             else

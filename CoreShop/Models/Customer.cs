@@ -12,10 +12,10 @@ namespace CoreShop.Models
         [Display(Name="Customer #")]
         public string CustomerNumber { get; set; }
 
-        [Required]
+        [DataType(DataType.Text)]
         public string Firstname { get; set; }
 
-        [Required]
+        [DataType(DataType.Text)]
         public string Lastname { get; set; }
 
         [Required]

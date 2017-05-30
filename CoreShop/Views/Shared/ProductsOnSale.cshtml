@@ -1,10 +1,9 @@
-﻿@model CoreShop.Models.Product
-
+﻿@model Product
 <div class="col-xs-6 col-sm-4 col-md-3 col-lg-2">
     <div class="thumbnail">
         <img src="@Model.ImgURL1" alt="An image of the product.">
         <div class="caption">
-            <h3>@Html.DisplayFor(model => model.ProductNumber)</h3>
+            <h3>@Html.DisplayFor(model => model.Name)</h3>
             <p>@Html.DisplayFor(model => model.DescriptionShort)</p>
             <hr />
             <p>

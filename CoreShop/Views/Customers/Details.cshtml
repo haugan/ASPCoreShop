@@ -28,6 +28,7 @@
             <table class="table">
                 <tr>
                     <th>Order #</th>
+                    <th>Date</th>
                     <th>Status</th>
                     <th>Total</th>
                 </tr>
@@ -35,6 +36,7 @@
                 {
                     <tr>
                         <td><a asp-controller="Orders" asp-action="Details" asp-route-id="@order.OrderID">@Html.DisplayFor(item => order.OrderNumber)</a></td>
+                        <td>@Html.DisplayFor(item => order.OrderDate)</td>
                         <td>@Html.DisplayFor(item => order.Status)</td>
                         <td>-</td>
                     </tr>

@@ -69,8 +69,8 @@ namespace CoreShop.Controllers
 
             // CONVERT QUERY TO SINGLE PAGE OF ITEMS IN COLLECTION THAT SUPPORTS PAGING
             return View(await PageList<CustomerOrdersViewModel>.CreateAsync(groupQuery.AsNoTracking(),
-                                                                        pageIndex ?? 1, // IF NULL, RETURN 1 - ELSE RETURN PAGEINDEX VALUE
-                                                                        itemsOnPage));
+                                                                            pageIndex ?? 1, // IF NULL, RETURN 1 - ELSE RETURN PAGEINDEX VALUE
+                                                                            itemsOnPage));
 
             //return View(await groupQuery.AsNoTracking().ToListAsync());
         }
